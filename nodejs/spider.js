@@ -7,6 +7,23 @@ var nums=0;
 var nameErr=0;
 // 初始化url
 var url='http://store.steampowered.com/search/?filter=topsellers';
+//连接mysql
+var mysql=require('mysql');
+// 用createConnection方法创建一个表示与mysql数据库服务器之间连接的connection对象
+var connection= mysql.createConnection({
+    host:'localhost',
+    user:'root',
+    password:'123456',
+    database:'steamGames'
+});
+connection.connect(function (err) {
+    if(err){
+        console.log('数据库连接失败：'+err);
+    }else {
+        console.log('数据库连接成功');
+    }
+});
+connection.end();
 // 封装函数
 function fetchPage(url) {
     startRequest(url);
@@ -23,11 +40,12 @@ function startRequest(url) {
         });
         // 监听end事件，若整个HTML页面获取完毕，就执行回调函数
         res.on('end',function () {
-            console.log('网页加载完毕');
+            // console.log('网页加载完毕');
             // 使用cheerio模块解析HTML
             var $ = cheerio.load(html);
+            // list是game信息列表
             var list = $('#search_result_container div.search_rule').next().children().first().siblings();
-            console.log(list.length);
+            // console.log(list.length);
             list.each(function (index,item) {
                 var imgSrc=$('img',this).attr('src');
                 var name=$('.title',this).text().trim();
@@ -49,11 +67,13 @@ function startRequest(url) {
                 };
                 // console.log(imgSrc);
                 console.log(game);
-                savedImg(imgSrc,name);
+                // savedContent(name,game);
+                // savedImg(imgSrc,name);
             });
             var nextLink=$('div.search_pagination div.search_pagination_right').children().last().attr('href');
             // console.log(nextLink);
-            if(nums<=1000){
+            // 通过nums控制爬取数量
+            if(nums<=100){
                 fetchPage(nextLink);
             }
         });
@@ -62,8 +82,12 @@ function startRequest(url) {
     })
 }
 // 将内容资源存储在本地
-function savedContent() {
-    
+function savedContent(title,content) {
+    fs.appendFile('./data/' + title + '.txt', content, 'utf-8', function (err) {
+        if (err) {
+            console.log(err);
+        }
+    });
 }
 // 将图片资源存储在本地
 function savedImg(src,title) {
@@ -71,18 +95,7 @@ function savedImg(src,title) {
     request.head(src,function(err,ros,body){
         console.log(err);
     });
-    // if(!title.test(/[a-zA-Z]/)){
-    //     title=nameErr+'';
-    //     nameErr++;
-    // }
     request(src).pipe(fs.createWriteStream('./image/'+title+'.png'));
-    // request({uri: src, encoding: 'utf-8'}, function (error, response, body) {
-    //     if (!error && response.statusCode == 200) {
-    //         fs.writeFile('./image/'+title+'.jpg', body, 'utf-8', function (err) {
-    //             if (err) {console.log(err);}
-    //         });
-    //     }
-    // });
 }
 //运行
 fetchPage(url);
