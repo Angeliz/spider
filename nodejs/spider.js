@@ -2,33 +2,17 @@
 var fs = require('fs');
 var cheerio = require('cheerio');
 var request = require('request');
+var async = require("async");
+//链接数据库时使用的数据格式
+var gamelist=[];
 // 数据计数器
 var nums=0;
 var nameErr=0;
 // 初始化url
 var url='http://store.steampowered.com/search/?filter=topsellers';
-//连接mysql
-var mysql=require('mysql');
-// 用createConnection方法创建一个表示与mysql数据库服务器之间连接的connection对象
-var connection= mysql.createConnection({
-    host:'localhost',
-    user:'root',
-    database:'test'
-});
-connection.connect(function (err) {
-    if(err){
-        console.log('数据库连接失败：'+err);
-    }else {
-        console.log('数据库连接成功');
-    }
-});
-connection.end();
-// 封装函数
-function fetchPage(url) {
-    startRequest(url);
-}
+
 // 请求并处理数据
-function startRequest(url) {
+function startRequest (url) {
     http.get(url,function (res) {
         var html='';
         //统一编码
@@ -64,17 +48,19 @@ function startRequest(url) {
                     'time':time,
                     'price':price
                 };
-                // console.log(imgSrc);
-                console.log(game);
+                //game是对象格式
+                // console.log(game);
                 // savedContent(name,game);
                 // savedImg(imgSrc,name);
+                gamelist.push([game.id,game.name,game.system,game.time,game.price]);
             });
             var nextLink=$('div.search_pagination div.search_pagination_right').children().last().attr('href');
             // console.log(nextLink);
             // 通过nums控制爬取数量
-            if(nums<=100){
-                fetchPage(nextLink);
+            if(nums<=50){
+                startRequest(nextLink);
             }
+            insert(gamelist);
         });
     }).on('error',function (err) {
         console.log(err);
@@ -96,5 +82,41 @@ function savedImg(src,title) {
     });
     request(src).pipe(fs.createWriteStream('./image/'+title+'.png'));
 }
+// function con() {
+//     console.log(gamelist);
+// }
+//连接mysql
+var mysql=require('mysql');
+// 用createConnection方法创建一个表示与mysql数据库服务器之间连接的connection对象
+var connection= mysql.createConnection({
+    host:'localhost',
+    user:'root',
+    database:'steamGames'
+});
+connection.connect(function (err) {
+    if(err){
+        console.log('数据库连接失败：'+err);
+    }else {
+        console.log('数据库连接成功');
+    }
+});
+function insert (gamelist) {
+    //批量将数据插入数据表hotgames
+    //插入语句
+    var addData = "insert into hotgames(`id`,`name`,`system`,`time`,`price`) values ?";
+    //调用query函数完成数据的插入
+    connection.query(addData, [gamelist], function (err, rows, fields) {
+        if(err){
+            console.log('INSERT ERROR - ', err.message);
+            return;
+        }
+        console.log("插入数据成功");
+    });
+}
+// 封装函数
+function fetchPage (url) {
+    startRequest(url);
+}
 //运行
 fetchPage(url);
+// connection.end();
