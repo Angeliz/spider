@@ -57,10 +57,12 @@ function startRequest (url) {
             var nextLink=$('div.search_pagination div.search_pagination_right').children().last().attr('href');
             // console.log(nextLink);
             // 通过nums控制爬取数量
+            insert(gamelist);
             if(nums<=50){
+                // gamelist=[];
                 startRequest(nextLink);
             }
-            insert(gamelist);
+
         });
     }).on('error',function (err) {
         console.log(err);
