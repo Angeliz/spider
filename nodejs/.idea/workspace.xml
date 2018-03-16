@@ -17,8 +17,8 @@
       <file leaf-file-name="spider.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/spider.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="193">
-              <caret line="25" column="37" lean-forward="false" selection-start-line="25" selection-start-column="37" selection-end-line="25" selection-end-column="37" />
+            <state relative-caret-position="1014">
+              <caret line="39" column="40" lean-forward="false" selection-start-line="39" selection-start-column="40" selection-end-line="39" selection-end-column="40" />
               <folding />
             </state>
           </provider>
@@ -27,8 +27,13 @@
       <file leaf-file-name="poet-spider.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/poet-spider.js">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="312">
               <caret line="18" column="35" lean-forward="true" selection-start-line="18" selection-start-column="35" selection-end-line="18" selection-end-column="35" />
+=======
+            <state relative-caret-position="538">
+              <caret line="31" column="25" lean-forward="true" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="30" />
+>>>>>>> parent of 3b041e8... poet图片，爬虫遇到的问题都简单粗暴的解决了orz
               <folding />
             </state>
           </provider>
@@ -121,9 +126,6 @@
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
   </component>
-  <component name="SvnConfiguration">
-    <configuration />
-  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="753f9c4a-2b36-4b67-9e6c-6da9cf5897cc" name="Default" comment="" />
@@ -160,12 +162,20 @@
       <workItem from="1521026959763" duration="1790000" />
       <workItem from="1521028901430" duration="1430000" />
       <workItem from="1521030822340" duration="2246000" />
+<<<<<<< HEAD
       <workItem from="1521039356802" duration="15046000" />
+=======
+      <workItem from="1521039356802" duration="2366000" />
+>>>>>>> parent of 3b041e8... poet图片，爬虫遇到的问题都简单粗暴的解决了orz
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
+<<<<<<< HEAD
     <option name="totallyTimeSpent" value="56913000" />
+=======
+    <option name="totallyTimeSpent" value="44233000" />
+>>>>>>> parent of 3b041e8... poet图片，爬虫遇到的问题都简单粗暴的解决了orz
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
@@ -196,9 +206,7 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <option name="time" value="2" />
-    </breakpoint-manager>
+    <breakpoint-manager />
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
@@ -516,16 +524,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/spider.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="193">
-          <caret line="25" column="37" lean-forward="false" selection-start-line="25" selection-start-column="37" selection-end-line="25" selection-end-column="37" />
+        <state relative-caret-position="1014">
+          <caret line="39" column="40" lean-forward="false" selection-start-line="39" selection-start-column="40" selection-end-line="39" selection-end-column="40" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/poet-spider.js">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="312">
           <caret line="18" column="35" lean-forward="true" selection-start-line="18" selection-start-column="35" selection-end-line="18" selection-end-column="35" />
+=======
+        <state relative-caret-position="538">
+          <caret line="31" column="25" lean-forward="true" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="30" />
+>>>>>>> parent of 3b041e8... poet图片，爬虫遇到的问题都简单粗暴的解决了orz
           <folding />
         </state>
       </provider>
