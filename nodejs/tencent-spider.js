@@ -24,12 +24,17 @@ function startRequest(url) {
                 id++;
                 var src=$(item).children().first().attr('href');
                 var name=$('.figure_title',this).children().first().text();
+                // 评分
                 var score=$('.score_l',this).text()+$('.score_s',this).text();
+                // 播放量
                 var count=$('.figure_count .num',this).text();
+                // 集数
+                var nums=$('.figure_info',this).text();
                 videoList.push({
                     id:id,
                     name:name,
                     src:src,
+                    nums:nums,
                     score:score,
                     count:count
                 });
