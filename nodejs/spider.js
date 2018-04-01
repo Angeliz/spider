@@ -11,6 +11,21 @@ var nameErr=0;
 // 初始化url
 var url='http://store.steampowered.com/search/?filter=topsellers';
 
+var mysql=require('mysql');
+// 用createConnection方法创建一个表示与mysql数据库服务器之间连接的connection对象
+var connection= mysql.createConnection({
+    host:'localhost',
+    user:'root',
+    database:'steamGames'
+});
+connection.connect(function (err) {
+    if(err){
+        console.log('数据库连接失败：'+err);
+    }else {
+        console.log('数据库连接成功');
+    }
+});
+
 // 请求并处理数据
 function startRequest (url) {
     http.get(url,function (res) {
@@ -40,9 +55,9 @@ function startRequest (url) {
                 system=system.join(',');
                 var time=$('.search_released',this).text().trim();
                 var price=$('div.search_price',this).text().trim();
-                nums++;
+                // nums++;
                 var game={
-                    'id':nums,
+                    // 'id':++nums,
                     'name':name,
                     'system':system,
                     'time':time,
@@ -52,12 +67,13 @@ function startRequest (url) {
                 // console.log(game);
                 // savedContent(name,game);
                 // savedImg(imgSrc,name);
-                gamelist.push([game.id,game.name,game.system,game.time,game.price]);
+                gamelist.push([game.name,game.system,game.time,game.price]);
             });
+            insert(gamelist);
             var nextLink=$('div.search_pagination div.search_pagination_right').children().last().attr('href');
             // console.log(nextLink);
             // 通过nums控制爬取数量
-            insert(gamelist);
+
             if(nums<=50){
                 // gamelist=[];
                 startRequest(nextLink);
@@ -88,24 +104,11 @@ function savedImg(src,title) {
 //     console.log(gamelist);
 // }
 //连接mysql
-var mysql=require('mysql');
-// 用createConnection方法创建一个表示与mysql数据库服务器之间连接的connection对象
-var connection= mysql.createConnection({
-    host:'localhost',
-    user:'root',
-    database:'steamGames'
-});
-connection.connect(function (err) {
-    if(err){
-        console.log('数据库连接失败：'+err);
-    }else {
-        console.log('数据库连接成功');
-    }
-});
+
 function insert (gamelist) {
     //批量将数据插入数据表hotgames
     //插入语句
-    var addData = "insert into hotgames(`id`,`name`,`system`,`time`,`price`) values ?";
+    var addData = "insert into games(`name`,`system`,`time`,`price`) values ?";
     //调用query函数完成数据的插入
     connection.query(addData, [gamelist], function (err, rows, fields) {
         if(err){
@@ -113,6 +116,7 @@ function insert (gamelist) {
             return;
         }
         console.log("插入数据成功");
+        return 0;
     });
 }
 // 封装函数
