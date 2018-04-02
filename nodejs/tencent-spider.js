@@ -1,11 +1,9 @@
-//   http://v.qq.com/x/list/cartoon?sort=18&offset=0&itype=-1&iarea=1
-var http=require('http');
-var fs=require('fs');
+// async = require("async");
+var https=require('https');
 var cheerio=require('cheerio');
 
-var url='http://v.qq.com/x/list/cartoon?sort=18&offset=0&itype=-1&iarea=1';
+var url='https://v.qq.com/x/list/cartoon?iarea=1&offset=0';
 var videoList=[];
-var id=0;
 
 var mysql=require('mysql');
 // 用createConnection方法创建一个表示与mysql数据库服务器之间连接的connection对象
@@ -21,23 +19,23 @@ connection.connect(function (err) {
         console.log('数据库连接成功');
     }
 });
-function insert (gamelist) {
+function insert (datalist) {
     //批量将数据插入数据表games
     //插入语句
-    var addData = "insert into tencent(`name`,`src`,`nums`,`score`,`count`) values ?";
+    var addData = "insert into tencent1(`name`,`src`,`nums`,`score`,`play`) values ?";
     //调用query函数完成数据的插入
-    connection.query(addData, [gamelist], function (err, rows, fields) {
+    connection.query(addData, [datalist], function (err, rows, fields) {
         if(err){
             console.log('INSERT ERROR - ', err.message);
             return;
         }
-        console.log("插入数据成功");
+        // console.log("插入数据成功");
         return 0;
     });
 }
 
 function startRequest(url) {
-    http.get(url,function (res) {
+    https.get(url,function (res) {
         var html='';
         res.setEncoding('utf-8');
         res.on('data',function (chunk) {
@@ -52,13 +50,12 @@ function startRequest(url) {
             list.each(function (index,item) {
                 var videoData=[];
                 // console.log(item);'
-                id++;
                 var src=$(item).children().first().attr('href');
-                var name=$('.figure_title',this).children().first().text();
+                var name=$('.figure_title',this).children().first().text().split(" ").join("").replace("第1季","第一季").replace("第2季","第二季");
                 // 评分
                 var score=$('.score_l',this).text()+$('.score_s',this).text();
                 // 播放量
-                var count=$('.figure_count .num',this).text();
+                var play=$('.figure_count .num',this).text();
                 // 集数
                 var nums=$('.figure_info',this).text();
                 video={
@@ -66,7 +63,7 @@ function startRequest(url) {
                     src:src,
                     nums:nums,
                     score:score,
-                    count:count
+                    play:play
                 };
                 // videoList.push({
                 //     // id:id,
@@ -76,22 +73,45 @@ function startRequest(url) {
                 //     score:score,
                 //     count:count
                 // });
-                videoData.push([video.name,video.src,video.nums,video.score,video.count]);
+                videoData.push([video.name,video.src,video.nums,video.score,video.play]);
                 if(videoData!==[]){
                     insert(videoData);
                 }
             });
             // console.log(videoList);
-            // insert(videoData);
-            var nextLink='http://v.qq.com/x/list/cartoon'+$('.page_next').attr('href');
-            // console.log(nextLink);
-            startRequest(nextLink);
+            var nextLink='https://v.qq.com/x/list/cartoon'+$('.page_next').attr('href');
+            console.log(nextLink);
+            if(nextLink!=="https://v.qq.com/x/list/cartoonjavascript:;"){
+                startRequest(nextLink);
+            }else{
+                console.log("数据存储完毕");
+                return 0;
+            }
         })
     })
 }
 
+
+// fetchPage=function (url) {
+//     return new Promise(function (resovle, reject) {
+//         startRequest(url);
+//         resovle();
+//     })
+// };
+// out=function () {
+//   return new Promise(function (resovle, reject) {
+//       // console.log("数据存储完毕");
+//       resovle();
+//   });
+// };
+// fn = async function () {
+//     //这里需要同步加载
+//     await fetchPage(url);
+//     await out();
+// }();
+
 // 封装的函数
-function fetchPage(url) {
+function fetchPage(url){
     startRequest(url);
 }
 fetchPage(url);
