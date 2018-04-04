@@ -2,8 +2,6 @@ async = require("async");
 var https=require('https');
 var cheerio=require('cheerio');
 var id=0;
-// console.log(url);
-var videoList=[];
 
 var mysql=require('mysql');
 // 用createConnection方法创建一个表示与mysql数据库服务器之间连接的connection对象
@@ -21,19 +19,17 @@ connection.connect(function (err) {
 });
 
 var tencentSrc=[];
-var bilibiliSrc=[];
-var iqiyiSrc=[];
-var youkuSrc=[];
-var tencent="tencent1";
-var bilibili="bilibili1";
-var iqiyi="iqiyi1";
-var youku="youku1";
+// var bilibiliSrc=[];
+// var iqiyiSrc=[];
+// var youkuSrc=[];
+var tencent="tencent";
+// var bilibili="bilibili1";
+// var iqiyi="iqiyi1";
+// var youku="youku1";
 
 selectSrc = function(table,tableSrc) {
     return new Promise(function (resovle, reject) {
         var selectData = "select src from"+" "+table;
-        // console.log(selectData);
-        //调用query函数完成数据的选择
         connection.query(selectData,function (err, rows, fields) {
             if(err){
                 console.log('SELECT ERROR - ', err.message);
@@ -42,13 +38,21 @@ selectSrc = function(table,tableSrc) {
             for(let i=0;i<rows.length;i++){
                 tableSrc.push(rows[i].src);
             }
-            // console.log(tencentSrc);
             console.log("取出数据完成");
             resovle();
         });
     });
 };
-
+function update(data,table) {
+    var sql="update "+table+" set time=?,label=?,description=? where name=?";
+    connection.query(sql, data, function (err, rows, fields) {
+        if(err){
+            console.log('UPDATE ERROR - ', err.message);
+            return;
+        }
+        return 0;
+    });
+}
 
 function startRequest(url) {
     https.get(url,function (res) {
@@ -61,7 +65,7 @@ function startRequest(url) {
             // console.log(html.length);
             var $ = cheerio.load(html);
             // list是信息列表
-            var name=$('.video_title a').text().split(" ").join("").replace("第1季","第一季").replace("第2季","第二季");
+            var name=$('.player_title a').text().split(" ").join("").replace("第1季","第一季").replace("第2季","第二季");
             var description=$('.summary').text().trim().split("\n").join("");
             var list=$('._video_tags').children('a');
             var time='';
@@ -73,30 +77,21 @@ function startRequest(url) {
                     label=$(item).text();
                 }
             });
-
-            // 调试
-            videoList.push({
-                'name': name,
-                'description': description,
-                'time': time,
-                'label': label
-            });
-            console.log(videoList);
-
-            // var video={
-            //     'name': name,
-            //     'description': description,
-            //     'time': time,
-            //     'label': label
-            // };
-            // videoData.push([video.name,video.time,video.lable,video.description]);
-            // if(videoData!==[]){
-            //     insert(videoData);
-            // }
-
-            var nextLink= tencentSrc[++id];
-            // console.log(nextLink);
-            startRequest(nextLink);
+            var videoData=[time,label,description,name];
+            // console.log(videoData);
+            if(videoData[3]!==""){
+                update(videoData,tencent);
+                var nextLink= tencentSrc[++id];
+                console.log(nextLink);
+                if(id<tencentSrc.length){
+                    startRequest(nextLink);
+                }else{
+                    console.log("数据存储完毕");
+                    return 0;
+                }
+            }else {
+                startRequest(url)
+            }
         })
     })
 }

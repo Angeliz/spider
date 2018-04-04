@@ -3,7 +3,7 @@ var https=require('https');
 var cheerio=require('cheerio');
 
 var url='https://v.qq.com/x/list/cartoon?iarea=1&offset=0';
-var videoList=[];
+// var videoList=[];
 
 var mysql=require('mysql');
 // 用createConnection方法创建一个表示与mysql数据库服务器之间连接的connection对象
@@ -22,7 +22,7 @@ connection.connect(function (err) {
 function insert (datalist) {
     //批量将数据插入数据表games
     //插入语句
-    var addData = "insert into tencent1(`name`,`src`,`nums`,`score`,`play`) values ?";
+    var addData = "insert into tencent(`name`,`src`,`nums`,`score`,`play`) values ?";
     //调用query函数完成数据的插入
     connection.query(addData, [datalist], function (err, rows, fields) {
         if(err){
@@ -53,9 +53,9 @@ function startRequest(url) {
                 var src=$(item).children().first().attr('href');
                 var name=$('.figure_title',this).children().first().text().split(" ").join("").replace("第1季","第一季").replace("第2季","第二季");
                 // 评分
-                var score=$('.score_l',this).text()+$('.score_s',this).text();
+                var score=Number($('.score_l',this).text()+$('.score_s',this).text());
                 // 播放量
-                var play=$('.figure_count .num',this).text();
+                var play=Number($('.figure_count .num',this).text().replace("万","0000").replace("亿","00000000"))/10000;
                 // 集数
                 var nums=$('.figure_info',this).text();
                 video={
@@ -65,17 +65,10 @@ function startRequest(url) {
                     score:score,
                     play:play
                 };
-                // videoList.push({
-                //     // id:id,
-                //     name:name,
-                //     src:src,
-                //     nums:nums,
-                //     score:score,
-                //     count:count
-                // });
                 videoData.push([video.name,video.src,video.nums,video.score,video.play]);
                 if(videoData!==[]){
                     insert(videoData);
+                    // console.log(videoData);
                 }
             });
             // console.log(videoList);
@@ -90,25 +83,6 @@ function startRequest(url) {
         })
     })
 }
-
-
-// fetchPage=function (url) {
-//     return new Promise(function (resovle, reject) {
-//         startRequest(url);
-//         resovle();
-//     })
-// };
-// out=function () {
-//   return new Promise(function (resovle, reject) {
-//       // console.log("数据存储完毕");
-//       resovle();
-//   });
-// };
-// fn = async function () {
-//     //这里需要同步加载
-//     await fetchPage(url);
-//     await out();
-// }();
 
 // 封装的函数
 function fetchPage(url){
